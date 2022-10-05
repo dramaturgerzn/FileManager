@@ -1,23 +1,43 @@
 import os
 import shutil
 
+upper_dir = os.getcwd()
+
 
 def mkdir():
-    nm_dir = input('Введите название новой директории: ')
-    os.mkdir(nm_dir)
-    print(f'Директория {nm_dir} создана.' + '\n')
+    path = input('Введите название новой директории, если хотите создать ее в текущем каталоге, или путь к ней: ')
+    if (os.getcwd() == upper_dir) and not (upper_dir in path) and (path.count('\\') != 0 or path.count('/') != 0):
+        print('Вы пытаетесь подняться выше рабочей директории.' + '\n')
+    else:
+        try:
+            os.mkdir(path)
+            print(f'Директория {path} создана.' + '\n')
+        except FileExistsError:
+            print('Создаваемая директория или файл уже существует.' + '\n')
 
 
 def rmdir():
-    nm_dir = input('Введите название удаляемой директории: ')
-    os.rmdir(nm_dir)
-    print(f'Директория {nm_dir} удалена.' + '\n')
+    path = input('Введите название или путь удаляемой директории: ')
+    if (os.getcwd() == upper_dir) and not (upper_dir in path) and (path.count('`\`') != 0 or path.count('/') != 0):
+        print('Вы пытаетесь подняться выше рабочей директории.' + '\n')
+    else:
+        try:
+            os.rmdir(path)
+            print(f'Директория {path} удалена.' + '\n')
+        except FileNotFoundError:
+            print('Удаляемая директория или файл не найден.' + '\n')
 
 
 def cd():
     path = input("Введите путь к директории (если хотите подняться на уровень"
                  " выше, введите '..' : ")
-    os.chdir(path)
+    if path == '..' and os.getcwd() == upper_dir:
+        print('Вы в домашней папке, нельзя подняться на уровень выше' + '\n')
+    else:
+        try:
+            os.chdir(path)
+        except FileNotFoundError:
+            print('Путь не найден.' + '\n')
 
 
 def pwd():
@@ -41,39 +61,55 @@ def wr_file():
 
 def cat():
     nm_file = input('Введите название файла С РАСШИРЕНИЕМ TXT (или путь к файлу) для просмотра содержимого: ')
-    f = open(nm_file, 'r')
-    for line in f:
-        print(line[:-1])
-    f.close()
+    try:
+        f = open(nm_file, 'r')
+        for line in f:
+            print(line[:-1])
+        f.close()
+    except FileNotFoundError:
+        print('Файл не найден.')
 
 
 def rm_file():
     nm_file = input('Введите название файла С РАСШИРЕНИЕМ TXT (или путь к файлу) для удаления: ')
-    os.remove(nm_file)
-    print(f'Файл {nm_file} удален.' + '\n')
+    try:
+        os.remove(nm_file)
+        print(f'Файл {nm_file} удален.' + '\n')
+    except FileNotFoundError:
+        print('Файл не найден.')
 
 
 def rnm_file():
     old = input('Введите название файла С РАСШИРЕНИЕМ TXT (или путь к файлу) для переименнования: ')
     new = input('Введите новое название для переименнования: ')
-    os.rename(old, new)
-    print(f'Файл `{old}` перееименнован в `{new}`.' + '\n')
+    try:
+        os.rename(old, new)
+        print(f'Файл `{old}` перееименнован в `{new}`.' + '\n')
+    except FileNotFoundError:
+        print('Файл не найден.')
 
 
 def mv_file():
     old = input('Введите название файла С РАСШИРЕНИЕМ TXT (или путь к файлу) для перемещения: ')
     new = input('Введите новый путь: ')
-    shutil.move(old, new)
+    try:
+        shutil.move(old, new)
+    except FileNotFoundError:
+        print('Файл не найден.')
 
 
 def copy_file():
     old = input('Введите название файла С РАСШИРЕНИЕМ TXT (или путь к файлу) для копирования: ')
     new = input('Введите новый путь: ')
-    shutil.copy(old, new)
+    try:
+        shutil.copy(old, new)
+    except FileNotFoundError:
+        print('Файл не найден.')
 
 
 def menu():
     st = ''
+    print('\n' + f'ВАША ДОМАШНЯЯ ДИРЕКТОРИЯ: {os.getcwd()}. НЕЛЬЗЯ ВЫХОДИТЬ ВЫШЕ ДОМАШНЕЙ ДИРЕКТОРИИ.' + '\n')
     while True:
         print('0. Вывести текущую рабочую директорию.')
         print('1. Создать папку.')
@@ -128,7 +164,7 @@ def menu():
             break
 
         else:
-            print('Вы выбрали несуществующий пункт меню, повторите ввод ')
+            print('Вы выбрали несуществующий пункт меню, повторите ввод' + '\n')
 
 
 menu()
